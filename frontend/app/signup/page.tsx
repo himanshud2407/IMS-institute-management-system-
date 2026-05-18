@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { Home, Mail, Lock, User, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
+import Script from "next/script";
 
 export default function SignUpPage() {
   const [firstName, setFirstName] = useState("");
@@ -15,6 +16,71 @@ export default function SignUpPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+
+  const handleGoogleLogin = async (response: any) => {
+    setError("");
+    setLoading(true);
+    try {
+      const res = await fetch("http://127.0.0.1:8000/api/auth/google/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          token: response.credential,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        localStorage.setItem("access_token", data.access);
+        localStorage.setItem("refresh_token", data.refresh);
+        setIsSuccess(true);
+      } else {
+        setError(data.detail || "Google authentication failed. Please try again.");
+      }
+    } catch (err) {
+      setError("Unable to connect to the backend server. Please make sure Django is running on port 8000.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (typeof window === "undefined" || isSuccess) return;
+
+    const initializeGoogle = () => {
+      if ((window as any).google) {
+        (window as any).google.accounts.id.initialize({
+          client_id:
+            process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "882963231545-vgej5h2qjsv9i6j4ist4rhf26ls4ihec.apps.googleusercontent.com",
+          callback: handleGoogleLogin,
+        });
+        const googleBtn = document.getElementById("google-signup-btn");
+        if (googleBtn) {
+          (window as any).google.accounts.id.renderButton(googleBtn, {
+            theme: "outline",
+            size: "large",
+            width: "350",
+            shape: "pill",
+          });
+        }
+      }
+    };
+
+    if ((window as any).google) {
+      initializeGoogle();
+    } else {
+      const interval = setInterval(() => {
+        if ((window as any).google) {
+          initializeGoogle();
+          clearInterval(interval);
+        }
+      }, 500);
+      return () => clearInterval(interval);
+    }
+  }, [isSuccess]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -98,74 +164,6 @@ export default function SignUpPage() {
             <p className="text-sm text-muted-foreground mt-2">
               Join us today and start managing your institute efficiently
             </p>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <Button
-              type="button"
-              variant="outline"
-              className="flex w-full items-center justify-center gap-2 transition-all duration-200 hover:bg-zinc-100 dark:hover:bg-zinc-800"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 256 262"
-              >
-                <path
-                  fill="#4285f4"
-                  d="M255.878 133.451c0-10.734-.871-18.567-2.756-26.69H130.55v48.448h71.947c-1.45 12.04-9.283 30.172-26.69 42.356l-.244 1.622l38.755 30.023l2.685.268c24.659-22.774 38.875-56.282 38.875-96.027"
-                ></path>
-                <path
-                  fill="#34a853"
-                  d="M130.55 261.1c35.248 0 64.839-11.605 86.453-31.622l-41.196-31.913c-11.024 7.688-25.82 13.055-45.257 13.055c-34.523 0-63.824-22.773-74.269-54.25l-1.531.13l-40.298 31.187l-.527 1.465C35.393 231.798 79.49 261.1 130.55 261.1"
-                ></path>
-                <path
-                  fill="#fbbc05"
-                  d="M56.281 156.37c-2.756-8.123-4.351-16.827-4.351-25.82c0-8.994 1.595-17.697 4.206-25.82l-.073-1.73L15.26 71.312l-1.335.635C5.077 89.644 0 109.517 0 130.55s5.077 40.905 13.925 58.602z"
-                ></path>
-                <path
-                  fill="#eb4335"
-                  d="M130.55 50.479c24.514 0 41.05 10.589 50.479 19.438l36.844-35.974C195.245 12.91 165.798 0 130.55 0C79.49 0 35.393 29.301 13.925 71.947l42.211 32.783c10.59-31.477 39.891-54.251 74.414-54.251"
-                ></path>
-              </svg>
-              <span>Google</span>
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              className="flex w-full items-center justify-center gap-2 transition-all duration-200 hover:bg-zinc-100 dark:hover:bg-zinc-800"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 256 256"
-              >
-                <path fill="#f1511b" d="M121.666 121.666H0V0h121.666z"></path>
-                <path fill="#80cc28" d="M256 121.666H134.335V0H256z"></path>
-                <path
-                  fill="#00adef"
-                  d="M121.663 256.002H0V134.336h121.663z"
-                ></path>
-                <path
-                  fill="#fbbc09"
-                  d="M256 256.002H134.335V134.336H256z"
-                ></path>
-              </svg>
-              <span>Microsoft</span>
-            </Button>
-          </div>
-
-          <div className="relative my-8">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-border" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-muted-foreground dark:bg-zinc-900">
-                Or continue with
-              </span>
-            </div>
           </div>
 
           {error && (
@@ -255,6 +253,23 @@ export default function SignUpPage() {
               )}
             </Button>
           </div>
+
+          <div className="relative my-8">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-border" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-white px-2 text-muted-foreground dark:bg-zinc-900">
+                Or continue with
+              </span>
+            </div>
+          </div>
+
+          <div className="flex flex-col items-center justify-center gap-3">
+            <div id="google-signup-btn" className="w-full flex justify-center min-h-[40px]"></div>
+          </div>
+
+          <Script src="https://accounts.google.com/gsi/client" strategy="lazyOnload" />
         </div>
 
         <div className="bg-zinc-50 dark:bg-zinc-800/50 rounded-b-xl border-t border-border p-6 text-center">

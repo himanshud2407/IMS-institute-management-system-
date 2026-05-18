@@ -48,3 +48,52 @@ class SignUpView(APIView):
                 {"detail": str(e)},
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+class GoogleAuthView(APIView):
+    def post(self, request):
+        token = request.data.get('token')
+        if not token:
+            return Response({"detail": "Google authentication token is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            from google.oauth2 import id_token
+            from google.auth.transport import requests as google_requests
+            from rest_framework_simplejwt.tokens import RefreshToken
+
+            # Verify the token payload from Google
+            # Note: We pass None for audience if we want to allow testing any Client ID,
+            # or you can restrict it to your client ID later.
+            idinfo = id_token.verify_oauth2_token(token, google_requests.Request(), clock_skew_in_seconds=10)
+
+            email = idinfo.get('email')
+            first_name = idinfo.get('given_name', '')
+            last_name = idinfo.get('family_name', '')
+
+            if not email:
+                return Response({"detail": "Invalid token payload: Email missing."}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Retrieve or create a user mapped to this email
+            user, created = User.objects.get_or_create(
+                email=email,
+                defaults={
+                    'username': email,
+                    'first_name': first_name,
+                    'last_name': last_name,
+                    'role': 'student'
+                }
+            )
+
+            # Generate standard app JWT credentials
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+                'email': user.email,
+                'first_name': user.first_name,
+                'created': created
+            }, status=status.HTTP_200_OK)
+
+        except ValueError as e:
+            return Response({"detail": f"Google verification failed: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"detail": f"Server authentication error: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
