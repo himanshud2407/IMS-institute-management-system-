@@ -146,5 +146,11 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
 }
 
+# Register Custom Auth Backend to support both Username and Email logins
+AUTHENTICATION_BACKENDS = [
+    'apps.accounts.backends.EmailOrUsernameModelBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
 # CORS Configuration (allows Next.js/Vite frontend to connect in development)
 CORS_ALLOW_ALL_ORIGINS = True
