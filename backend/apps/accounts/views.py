@@ -4,13 +4,42 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import get_user_model
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework import serializers
 
 User = get_user_model()
 
-from .serializers import CustomTokenObtainPairSerializer
+
+class CustomTokenSerializer(TokenObtainPairSerializer):
+    """
+    Extends the default JWT serializer to:
+    1. Accept 'email' field as an alternative to 'username'
+    2. Return 'role' and 'username' in the token response
+    """
+    email = serializers.CharField(required=False)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields[self.username_field].required = False
+
+    def validate(self, attrs):
+        # Support both 'username' and 'email' fields in payload
+        identifier = attrs.get('email') or attrs.get('username')
+
+        if not identifier:
+            raise serializers.ValidationError({"detail": "Email or username is required."})
+
+        # Map to username field for the default authenticate mechanism
+        attrs[self.username_field] = identifier
+
+        data = super().validate(attrs)
+        data['role'] = self.user.role
+        data['username'] = self.user.username
+        return data
+
 
 class LoginView(TokenObtainPairView):
-    serializer_class = CustomTokenObtainPairSerializer
+    serializer_class = CustomTokenSerializer
 
 class SignUpView(APIView):
     def post(self, request):
@@ -90,6 +119,8 @@ class GoogleAuthView(APIView):
             return Response({
                 'refresh': str(refresh),
                 'access': str(refresh.access_token),
+                'role': user.role,
+                'username': user.username,
                 'email': user.email,
                 'first_name': user.first_name,
                 'created': created
