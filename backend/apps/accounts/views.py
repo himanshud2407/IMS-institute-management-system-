@@ -7,8 +7,10 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
+from .serializers import CustomTokenObtainPairSerializer
+
 class LoginView(TokenObtainPairView):
-    pass
+    serializer_class = CustomTokenObtainPairSerializer
 
 class SignUpView(APIView):
     def post(self, request):

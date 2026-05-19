@@ -92,7 +92,7 @@ export default function LoginPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          username: email, // SimpleJWT uses username by default
+          email: email, 
           password: password,
         }),
       });
