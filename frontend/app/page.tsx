@@ -124,6 +124,15 @@ export default function LoginPage() {
     }
   }, [isSuccess]);
 
+  useEffect(() => {
+    if (isSuccess && loggedInRole === "admin") {
+      const timer = setTimeout(() => {
+        router.push("/admin");
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [isSuccess, loggedInRole, router]);
+
   const handleLogin = async (loginEmail: string, loginPassword: string, isDemoLogin = false) => {
     setError("");
     if (isDemoLogin) {

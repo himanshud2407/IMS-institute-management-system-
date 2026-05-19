@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap');
 @import "tailwindcss";
 
 @plugin "../node_modules/tailwindcss-animate";
@@ -60,15 +62,16 @@
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-background: #f8f9ff;
+  --color-foreground: #031d34;
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
+  --color-primary: #051125;
   --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
+  --color-secondary: #47607e;
+  --color-border-subtle: rgba(119, 141, 169, 0.2);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
@@ -85,9 +88,135 @@
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
   --radius-sm: calc(var(--radius) - 4px);
+  --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+
+  /* Dashboard Theme */
+  --color-on-error-container: #93000a;
+  --color-primary-fixed-dim: #bbc6e2;
+  --color-surface-container-high: #dbe9ff;
+  --color-surface-bright: #f8f9ff;
+  --color-inverse-on-surface: #e9f1ff;
+  --color-tertiary-fixed-dim: #dfc299;
+  --color-surface-container-low: #eef4ff;
+  --color-inverse-primary: #bbc6e2;
+  --color-on-secondary-fixed-variant: #2f4865;
+  --color-surface-tint: #545e76;
+  --color-primary-fixed: #d7e2ff;
+  --color-on-primary-fixed-variant: #3c475d;
+  --color-on-tertiary-container: #a28963;
+  --color-on-primary-container: #828da7;
+  --color-tertiary-fixed: #fcdeb3;
+  --color-on-primary-fixed: #101b30;
+  --color-surface-variant: #d1e4ff;
+  --color-secondary-container: #c2dcff;
+  --color-outline: #75777d;
+  --color-on-surface-variant: #45474d;
+  --color-on-secondary-fixed: #001d36;
+  --color-outline-variant: #c5c6cd;
+  --color-tertiary-container: #332306;
+  --color-on-surface: #031d34;
+  --color-on-background: #031d34;
+  --color-inverse-surface: #1b324a;
+  --color-on-tertiary-fixed: #271901;
+  --color-on-error: #ffffff;
+  --color-on-tertiary: #ffffff;
+  --color-surface-container: #e5efff;
+  --color-surface: #f8f9ff;
+  --color-on-primary: #ffffff;
+  --color-surface-container-lowest: #ffffff;
+  --color-secondary-fixed: #d1e4ff;
+  --color-tertiary: #1a0f00;
+  --color-surface-container-highest: #d1e4ff;
+  --color-surface-dim: #c5dcfb;
+  --color-on-secondary-container: #48617e;
+  --color-error-container: #ffdad6;
+  --color-on-secondary: #ffffff;
+  --color-secondary-fixed-dim: #afc9ea;
+  --color-on-tertiary-fixed-variant: #574423;
+  --color-primary-container: #1b263b;
+
+  --spacing-margin-mobile: 16px;
+  --spacing-margin-desktop: 32px;
+  --spacing-gutter: 24px;
+  --spacing-gutter-desktop: 32px;
+  --spacing-unit: 4px;
+  --spacing-stack-lg: 32px;
+  --spacing-container-max-width: 1440px;
+
+  --font-headline-lg-mobile: Inter, sans-serif;
+  --font-body-lg: Inter, sans-serif;
+  --font-label-md: Inter, sans-serif;
+  --font-display-lg: Inter, sans-serif;
+  --font-title-lg: Inter, sans-serif;
+  --font-headline-md: Inter, sans-serif;
+  --font-headline-lg: Inter, sans-serif;
+  --font-body-md: Inter, sans-serif;
+}
+
+@layer utilities {
+  .glass-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(119, 141, 169, 0.2);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .glass-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px -10px rgba(13, 27, 42, 0.1);
+    border-color: rgba(119, 141, 169, 0.4);
+  }
+  
+  .sidebar-item-active {
+    background-color: #c2dcff;
+    color: #051125;
+    font-weight: 700;
+    border-radius: 0.5rem;
+  }
+  
+  .material-symbols-outlined {
+    font-family: 'Material Symbols Outlined';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-smoothing: antialiased;
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+
+  .text-title-sm {
+    font-size: 14px;
+    line-height: 20px;
+  }
+  .text-label-md {
+    font-size: 12px;
+    line-height: 16px;
+  }
+  .text-body-md {
+    font-size: 14px;
+    line-height: 20px;
+  }
+  .text-headline-md {
+    font-size: 24px;
+    line-height: 32px;
+  }
+  .text-headline-lg {
+    font-size: 32px;
+    line-height: 40px;
+  }
+  .text-title-lg {
+    font-size: 20px;
+    line-height: 28px;
+  }
 }
 
 @layer base {
